@@ -2,6 +2,8 @@
 
 import { database } from "./database";
 import { redirect } from "next/navigation";
+import path from "path";
+import fs from "fs";
 
 export type Errors = {
     email?: string;
@@ -32,7 +34,20 @@ export async function signup(prevState: FormState, formData: FormData){
         password: password
     }
 
-    database.push(newUser);
+    const filepath = path.resolve("./src/actions/database.ts");
+
+    let fileContent = fs.readFileSync(filepath,"utf-8");
+
+    const match = fileContent.match(/export const database = (\[[\s\S]*?\]);/);
+
+    if(match){
+        const jsonArray = eval(match[1]);
+        jsonArray.push(newUser);
+
+        const newContent = `export const database = ${JSON.stringify(jsonArray, null, 2)};\n`;
+
+        fs.writeFileSync(filepath, newContent);
+    }
 
     console.log(database);
 
