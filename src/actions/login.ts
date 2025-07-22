@@ -31,7 +31,7 @@ export async function login(prevState: FormState, formData : FormData){
 		return { errors }
 	}
 
-	if(database.includes({email,password})){
+	if(database.some(user => user.email === email && user.password === password)){
 		return { success: "Log In Successful"}
 	}else{
 		return { invalid: "Invalid Email or Password!"}

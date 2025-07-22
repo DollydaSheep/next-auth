@@ -1,3 +1,4 @@
+"use client"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -5,13 +6,21 @@ import { Input } from "@/components/ui/input"
 import Link from "next/link"
 import { useActionState } from "react"
 import { FormState, login } from "@/actions/login"
+import { signup } from "@/actions/signup"
 
 export default function SignUpForm(){
+
+	const initialState: FormState = {
+		errors:{}
+	}
+
+	const [state, formAction, isPending] = useActionState(signup,initialState);
+
 	return(
 		<div className="mx-auto flex flex-col w-md">
 			<h1 className="text-4xl font-bold mb-2">Sign Up</h1>
 			<p className="mb-4">Enter your email and password to sign up!</p>
-			<form action={""}>
+			<form action={formAction}>
 				<div className="flex flex mb-2 space-x-2">
 					<span>
 						<label htmlFor="">First Name</label>
