@@ -1,5 +1,9 @@
+import Dashboard from "./dashboard";
+
 export default function DashboardPage(){
     return(
-        <h1>Dashboard</h1>
+        <div className="flex justify-center items-center h-screen">
+            <Dashboard />
+        </div>
     )
 }
