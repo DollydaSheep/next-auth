@@ -46,11 +46,8 @@ export default function LoginForm(){
 					<Link className="text-violet-700" href={""}>Forgot password?</Link>
 				</div>
 				<Button className="w-full bg-violet-700 hover:bg-violet-800 cursor-pointer mb-2" disabled={isPending}>Sign In</Button>
-				{state?.success && (
-					<p className="text-green-500">{state?.success}</p>
-				)}
-				{state?.invalid && (
-					<p className="text-red-500">{state?.invalid}</p>
+				{state?.errors && (
+					<p className="text-red-500">{state?.errors.invalid}</p>
 				)}
 				<p>Don't have an account? <Link className="text-violet-700" href={"/signup"}>Sign Up</Link></p>
 			</form>

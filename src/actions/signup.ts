@@ -2,8 +2,9 @@
 
 import { database } from "./database";
 import { redirect } from "next/navigation";
-import path from "path";
-import fs from "fs";
+import prisma from "@/lib/prisma";
+
+const bcrypt = require("bcrypt");
 
 export type Errors = {
     email?: string;
@@ -16,6 +17,7 @@ export type FormState = {
 
 export async function signup(prevState: FormState, formData: FormData){
     
+    const firstName = formData.get("firstname") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
@@ -29,29 +31,28 @@ export async function signup(prevState: FormState, formData: FormData){
         errors.password = "Password is required!";
     }
 
-    const newUser = {
-        email: email,
-        password: password
+    const hash = await bcrypt.hash(password, 10);
+
+    try{
+        const newUser = await prisma.user.create({
+            data: {
+                email: email,
+                password: hash,
+                name: firstName
+            }
+        })
+        console.log("Successful Sign Up",newUser);
+    } catch (error: any){
+        if (error.code === "P2002"){
+            return { errors: { email: "Email already exists! "} };
+        }
+
+        console.error(error);
+        return { errors: { email: "Unexpected error occured. "} };
     }
 
-    const filepath = path.resolve("./src/actions/database.ts");
-
-    let fileContent = fs.readFileSync(filepath,"utf-8");
-
-    const match = fileContent.match(/export const database = (\[[\s\S]*?\]);/);
-
-    if(match){
-        const jsonArray = eval(match[1]);
-        jsonArray.push(newUser);
-
-        const newContent = `export const database = ${JSON.stringify(jsonArray, null, 2)};\n`;
-
-        fs.writeFileSync(filepath, newContent);
+    if (Object.keys(errors).length == 0){
+        redirect("/login");
     }
-
-    console.log(database);
-
-    console.log("Successful Sign Up",newUser);
-
-    redirect("/login");
+    
 }

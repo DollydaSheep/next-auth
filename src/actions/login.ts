@@ -3,6 +3,9 @@
 import { createSession } from "@/lib/session";
 import { database } from "./database";
 import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
+
+const bcrypt = require('bcrypt');
 
 export type Errors = {
 	email?: string;
@@ -33,15 +36,33 @@ export async function login(prevState: FormState, formData : FormData){
 		return { errors }
 	}
 
-	
+	try{
+		const user = await prisma.user.findUnique({
+			where: {
+				email: email,
+			}
+		})
 
-	if(database.some(user => user.email === email && user.password === password)){
-		await createSession(email);
-		redirect("/dashboard")
-	}else{
-		return { invalid: "Invalid Email or Password!"}
+		if (!user) {
+			return { errors: { invalid: "Invalid Email or Password!" } };
+		}
+
+		const match = await bcrypt.compare(password, user?.password);
+
+		if(match){
+			await createSession(email);
+			console.log("Sign In Successful!",user);
+		} else {
+			return { errors: { invalid: "Invalid Email or Password!"}};
+		}
+
+	} catch (error:any){
+		console.error(error);
+		return { errors: { invalid: "Something went wrong. Please try again." } };
+	}
+	
+	if(Object.keys(errors).length === 0){
+		redirect("/dashboard");
 	}
 
-	console.log("Email",email);
-	console.log("Password",password);
 }

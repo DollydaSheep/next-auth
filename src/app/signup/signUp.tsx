@@ -7,6 +7,7 @@ import Link from "next/link"
 import { useActionState } from "react"
 import { FormState, login } from "@/actions/login"
 import { signup } from "@/actions/signup"
+import { error } from "console"
 
 export default function SignUpForm(){
 
@@ -41,6 +42,7 @@ export default function SignUpForm(){
 					<Input type="password" name="password"/>
 					
 				</div>
+				{state?.errors && (<p className="text-red-500 mb-2">{state?.errors.email}</p>)}
 				<div className="flex justify-between mb-4">
 					<span className="flex">
 						<Checkbox className="size-5"/>
