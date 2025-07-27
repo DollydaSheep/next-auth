@@ -1,7 +1,24 @@
+import { decrypt } from "@/lib/session";
 import Navbar from "./navbar";
+import { cookies } from "next/headers";
+import prisma from "@/lib/prisma";
 
 
-export default function Dashboard(){
+export default async function Dashboard(){
+
+    const session = await decrypt((await cookies()).get("session")?.value);
+
+
+    const sessionUser = session?.userId as string
+
+    const data = await prisma.user.findUnique({
+        where : {
+            id : parseInt(sessionUser)
+        }
+    })
+
+    console.log(data);
+
     return(
         <div className="relative border border-gray-300 w-full md:w-2/3 h-2/3">
             <Navbar />

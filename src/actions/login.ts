@@ -50,7 +50,7 @@ export async function login(prevState: FormState, formData : FormData){
 		const match = await bcrypt.compare(password, user?.password);
 
 		if(match){
-			await createSession(email);
+			await createSession((user.id).toString());
 			console.log("Sign In Successful!",user);
 		} else {
 			return { errors: { invalid: "Invalid Email or Password!"}};
